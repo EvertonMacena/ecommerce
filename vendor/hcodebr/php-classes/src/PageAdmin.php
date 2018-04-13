@@ -1,5 +1,7 @@
 <?php
 
+use \Hcode\Page;
+
 namespace Hcode;
 
 class PageAdmin extends Page{
@@ -9,3 +11,4 @@ class PageAdmin extends Page{
         parent::__construct($opt, $tpl_dir);
     }
 }
+?>
