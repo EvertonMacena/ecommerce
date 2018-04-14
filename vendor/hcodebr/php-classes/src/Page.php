@@ -34,7 +34,7 @@ public function __construct($opt  = array(), $tpl_dir = "/views/"){
 }
 
 public function setData ($data  = array()){
-     foreach ($this->options["data"] as $key => $values){
+     foreach ($data as $key => $values){
             $this->tpl->assign($key, $values);
         }
 }

@@ -3,6 +3,7 @@
 session_start();
 
 require_once("vendor/autoload.php");
+require("functions.php");
 
 use \Slim\Slim;
 use \Hcode\Page;
@@ -14,6 +15,7 @@ use \Hcode\Model\Product;
 $app = new Slim();
 
 $app->config('debug', true);
+
 /**
 require_once("admin.php");
 require_once("site.php");
@@ -23,8 +25,9 @@ require_once("admin-products.php");
 */
 $app->get('/', function() {
 
+    $products = Product::listAll();
     $page = new Page();
-    $page->setTpl("index");
+    $page->setTpl("index", array("produtos" => Product::checkList($products)));
 });
 
 $app->get('/admin', function() {
@@ -302,7 +305,7 @@ $app->post("/admin/products/create", function(){
 
     User::verify_Login();
 
-    $product = new Products();
+    $product = new Product();
 
     $product->setData($_POST);
 

@@ -91,7 +91,8 @@ class User extends Model{
 
         $sql = new Sql();
 
-         $results = $sql->select("CALL sp_usersupdate_save(:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", array(
+         $results = $sql->select("CALL sp_usersupdate_save(:iduser,:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", array(
+            ":iduser"=>$this->getiduser(),
             ":desperson"=>$this->getdesperson(),
             ":deslogin"=>$this->getdeslogin(),
             ":despassword"=>$this->getdespassword(),
@@ -100,6 +101,7 @@ class User extends Model{
             ":inadmin"=>$this->getinadmin()
 
         ));
+         $this->setData($results[0]);
     }
 
     public function delete(){
