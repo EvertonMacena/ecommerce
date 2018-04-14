@@ -38,6 +38,17 @@ $app->get('/admin', function() {
     $page->setTpl("index");
 });
 
+$app->get("/categories/:idcategory", function($idcategory){
+
+    $categoria = new Category();
+
+    $categoria->get((int)$idcategory);
+
+    $page = new Page();
+
+    $page->setTpl("category", ['categoria'=>$categoria->getValues(), 'products'=>Product::checkList($categoria->getProducts())]);
+});
+
 $app->get('/admin/login', function(){
 
     $page = new PageAdmin(["header"=>false, "footer"=>false]);
@@ -270,14 +281,52 @@ $app->post("/admin/categories/:idcategory", function($idcategory){
     exit;
 });
 
-$app->get("/categories/:idcategory", function($idcategory){
+$app->get("/admin/categories/:idcategory/products", function($idcategory){
+    User::verify_login();
+
     $category = new Category();
 
     $category->get((int)$idcategory);
 
-    $page = new Page();
+    $page = new PageAdmin();
 
-    $page->setTpl("category", ['category'=>$category->getValues(), 'products'=>[]]);
+    $page->setTpl("categories-products", ['category'=>$category->getValues(),
+        'productsRelated'=>$category->getProducts(),
+        'productsNotRelated'=>$category->getProducts(false)]);
+});
+
+$app->get("/admin/categories/:idcategory/products/:idproduct/add", function($idcategory, $idproduct){
+    User::verify_login();
+
+    $category = new Category();
+
+    $category->get((int)$idcategory);
+
+    $product = new Product();
+
+    $product->get((int)$idproduct);
+
+    $category->addProduct($product);
+
+    header("Location: /admin/categories/".$idcategory."/products");
+    exit;
+});
+
+$app->get("/admin/categories/:idcategory/products/:idproduct/remove", function($idcategory, $idproduct){
+    User::verify_login();
+
+    $category = new Category();
+
+    $category->get((int)$idcategory);
+
+    $product = new Product();
+
+    $product->get((int)$idproduct);
+
+    $category->removeProduct($product);
+
+    header("Location: /admin/categories/".$idcategory."/products");
+    exit;
 });
 
 
@@ -362,6 +411,8 @@ $app->get("/admin/products/:idproduct/delete", function($idproduct){
     exit;
 
 });
+
+
 
 
 $app->run();
