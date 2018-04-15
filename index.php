@@ -39,6 +39,7 @@ $app->get('/admin', function() {
 });
 
 $app->get("/categories/:idcategory", function($idcategory){
+    $pages = (isset($_GET['page'])) ? (int)$_GET['page'] : 1;
 
     $categoria = new Category();
 
@@ -46,7 +47,17 @@ $app->get("/categories/:idcategory", function($idcategory){
 
     $page = new Page();
 
-    $page->setTpl("category", ['categoria'=>$categoria->getValues(), 'products'=>Product::checkList($categoria->getProducts())]);
+    $pagination = $categoria->getProductsPage($pages);
+
+    $pages = [];
+
+    for ($i=1; $i <=$pagination['pages'] ; $i++) {
+        array_push($pages, [
+            'link'=> "/categories/".$categoria->getidcategory()."?page=".$i,
+            'page'=> $i]);
+    }
+
+    $page->setTpl("category", ['categoria'=>$categoria->getValues(), 'products'=>$pagination["data"], 'pages'=>$pages]);
 });
 
 $app->get('/admin/login', function(){
