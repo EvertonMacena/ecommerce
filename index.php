@@ -60,6 +60,19 @@ $app->get("/categories/:idcategory", function($idcategory){
     $page->setTpl("category", ['categoria'=>$categoria->getValues(), 'products'=>$pagination["data"], 'pages'=>$pages]);
 });
 
+$app->get("/products/:desurl", function($desurl){
+    $product = new Product();
+
+    $product->getFromURL($desurl);
+
+    $page = new Page();
+
+    $page->setTpl("product-detail", [
+        'product'=>$product->getValues(),
+        'categories'=>$product->getCategories()
+    ]);
+});
+
 $app->get('/admin/login', function(){
 
     $page = new PageAdmin(["header"=>false, "footer"=>false]);
