@@ -156,7 +156,7 @@ class User extends Model{
             ":iduser"=>$this->getiduser()));
     }
 
-    public static function getForgot($email){
+    public static function getForgot($email, $inadmin = true){
         $sql = new Sql();
 
         $results = $sql->select("SELECT * FROM tb_persons a INNER JOIN tb_users b USING(idperson) WHERE a.desemail = :email", array(":email"=>$email));
@@ -179,8 +179,14 @@ class User extends Model{
 
                 $code = openssl_encrypt($dataRecovery['idrecovery'], 'aes-256-cbc', User::SECRET, 0, $iv);
 
+                if ($inadmin){
 
-                $link = "http://www.lojavirtual.com.br/admin/forgot/reset?code=$code";
+                     $link = "http://www.lojavirtual.com.br/admin/forgot/reset?code=$code";
+
+                } else {
+
+                     $link = "http://www.lojavirtual.com.br/forgot/reset?code=$code";
+                }
 
                 $mailer = new Mailer($data["desemail"], $data["desperson"], "Redefinir senha loja virtual", "mail-forgot", array("name" => $data["desperson"], "link" => $link));
 
