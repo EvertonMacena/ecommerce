@@ -12,6 +12,7 @@ use \Hcode\Model\User;
 use \Hcode\Model\Category;
 use \Hcode\Model\Product;
 use \Hcode\Model\Cart;
+use \Hcode\Model\Address;
 
 $app = new Slim();
 
@@ -84,6 +85,54 @@ $app->get("/cart", function(){
         'carrinho'=>$cart->getValues(),
         'produtos'=>$cart->getProducts(),
         'error'=>Cart::getMsgErro()]);
+});
+
+$app->get("/checkout", function(){
+
+    User::verify_login(false);
+
+    $cart = Cart::getFromSession();
+
+    $address = new Address();
+
+    $page = new Page();
+
+    $page->setTpl("checkout", [
+        'cart'=>$cart->getValues(),
+        'address'=>$address->getValues(),
+        'error'=>'']);
+});
+
+$app->get("/login", function(){
+
+    $page = new Page();
+
+    $page->setTpl("login", [
+        'error'=>User::getMsgErro()]);
+});
+
+$app->get("/logout", function(){
+
+    User::logout();
+    header("Location: /login");
+    exit;
+
+});
+
+$app->post("/login", function(){
+
+    try{
+
+        User::login($_POST['login'], $_POST['password']);
+
+    } catch (Exception $e){
+
+        User::setMsgErro($e->getMessage());
+
+    }
+
+    header("Location: /checkout");
+    exit;
 });
 
 $app->get("/cart/:idproduct/add", function($idproduct){
