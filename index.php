@@ -108,7 +108,9 @@ $app->get("/login", function(){
     $page = new Page();
 
     $page->setTpl("login", [
-        'error'=>User::getMsgErro()]);
+        'error'=>User::getMsgErro(),
+        'errorRegister'=>User::getErroRegister(),
+        'registerValues'=>(isset($_SESSION['registerValues'])) ? $_SESSION['registerValues'] : ['name'=>'', 'email'=>'','phone'=>'']]);
 });
 
 $app->get("/logout", function(){
@@ -133,6 +135,54 @@ $app->post("/login", function(){
 
     header("Location: /checkout");
     exit;
+});
+
+$app->post("/register", function(){
+
+    $_SESSION['registerValues'] = $_POST;
+
+    if(!isset($_POST['name']) || $_POST['name'] == ''){
+        User::setErroRegister("Preencha o nome corretamente !");
+        header("Location: /login");
+        exit;
+    }
+
+    if(!isset($_POST['email']) || $_POST['email'] == ''){
+        User::setErroRegister("Preencha o email corretamente !");
+        header("Location: /login");
+        exit;
+    }
+
+    if(!isset($_POST['password']) || $_POST['password'] == ''){
+        User::setErroRegister("Preencha a senha corretamente !");
+        header("Location: /login");
+        exit;
+    }
+
+    if(User::checkLoginExist($_POST['email']) === true){
+        User::setErroRegister("Email já é usado por um outro usuario");
+        header("Location: /login");
+        exit;
+    }
+
+    $user = new User();
+
+    $user->setData([
+        'inadmin'=>0,
+        'deslogin'=>$_POST['email'],
+        'desperson'=>$_POST['name'],
+        'desemail'=>$_POST['email'],
+        'despassword'=>$_POST['password'],
+        'nrphone'=>$_POST['phone']]);
+
+    $user->save();
+
+    User::login($_POST['email'], $_POST['password']);
+
+    header("Location: /checkout");
+    exit;
+
+
 });
 
 $app->get("/cart/:idproduct/add", function($idproduct){

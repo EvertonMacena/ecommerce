@@ -260,10 +260,32 @@ class User extends Model{
         $_SESSION[User::ERROR_REGISTER] = $msg;
     }
 
+    public static function getErroRegister (){
+        $msg = (isset($_SESSION[User::ERROR_REGISTER]) && $_SESSION[User::ERROR_REGISTER]) ? $_SESSION[User::ERROR_REGISTER] : '';
+
+        User::clearErroRegister();
+
+        return $msg;
+    }
+
+    public static function clearErroRegister(){
+        $_SESSION[User::ERROR_REGISTER] = NULL;
+    }
+
     public static function getPasswordHash($password){
         return password_hash($password, PASSWORD_DEFAULT, [
             'cost'=>12]);
     }
+
+    public static function checkLoginExist($login){
+       $sql = new Sql();
+
+       $results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :deslogin", [
+        ':deslogin'=>$login]);
+
+       return (count($results)>0);
+    }
+
 
 
 }
