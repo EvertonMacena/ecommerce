@@ -12,6 +12,7 @@ class User extends Model{
     const SECRET = "LojavirtualPhp79";
     const ERROR = "UserErro";
     const ERROR_REGISTER = "UserErrorRegister";
+    const SUCESS = "Sucesso";
 
     public static function getFromSession(){
 
@@ -139,7 +140,7 @@ class User extends Model{
             ":iduser"=>$this->getiduser(),
             ":desperson"=>utf8_decode($this->getdesperson()),
             ":deslogin"=>$this->getdeslogin(),
-            ":despassword"=>getPasswordHash($this->getdespassword()),
+            ":despassword"=>$this->getdespassword(),
             ":desemail"=>$this->getdesemail(),
             ":nrphone"=>$this->getnrphone(),
             ":inadmin"=>$this->getinadmin()
@@ -259,6 +260,28 @@ class User extends Model{
     public static function clearMsgErro (){
 
         $_SESSION[User::ERROR] = NULL;
+
+    }
+
+
+    public static function setSucess ($msg){
+
+        $_SESSION[User::SUCESS] = $msg;
+
+    }
+
+    public static function getSucess (){
+
+        $msg =  (isset($_SESSION[User::SUCESS]) && $_SESSION[User::SUCESS]) ? $_SESSION[User::SUCESS] : "";
+
+        User::clearSucess();
+
+        return $msg;
+    }
+
+    public static function clearSucess (){
+
+        $_SESSION[User::SUCESS] = NULL;
 
     }
 

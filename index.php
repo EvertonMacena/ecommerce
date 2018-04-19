@@ -137,6 +137,63 @@ $app->post("/login", function(){
     exit;
 });
 
+$app->get("/profile", function(){
+
+    User::verify_login(false);
+
+    $user = User::getFromSession();
+
+    $page = new Page();
+
+    $page->setTpl("profile", [
+        'user'=>$user->getValues(),
+        'profileMsg'=>User::getSucess(),
+        'profileError'=>User::getMsgErro()]);
+});
+
+$app->post("/profile", function (){
+
+    User::verify_login(false);
+
+    if (!isset($_POST['desperson']) || $_POST['desperson'] === "" ){
+        User::setMsgErro("Digite o nome");
+        header("Location: /profile");
+        exit;
+    }
+
+    if (!isset($_POST['desemail']) || $_POST['desemail'] === "" ){
+        User::setMsgErro("Digite o email");
+        header("Location: /profile");
+        exit;
+    }
+
+    $user = User::getFromSession();
+
+    if ($_POST['desemail'] !== $user->getdesemail()){
+
+        if (User::checkLoginExist($_POST['deslogin'])){
+            User::setMsgErro("Este usuario já existe");
+            header("Location: /profile");
+            exit;
+        }
+    }
+
+    $_POST['iduser'] = $user->getiduser();
+    $_POST['inadmin'] = $user->getinadmin();
+    $_POST['despassword'] = $user->getdespassword();
+    $_POST['deslogin'] = $_POST['desemail'];
+
+    $user->setData($_POST);
+
+    $user->update();
+
+    $_SESSION[User::SESSION] = $user->getValues();
+
+    User::setSucess("Dados alterado com sucesso");
+    header("Location: /profile");
+    exit;
+});
+
 $app->post("/register", function(){
 
     $_SESSION['registerValues'] = $_POST;
