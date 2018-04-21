@@ -952,11 +952,36 @@ $app->get("/admin/products", function(){
 
     User::verify_Login();
 
-    $products = Product::listAll();
+    $search = (isset($_GET['search'])) ? $_GET['search'] : '';
+    $page = (isset($_GET['page'])) ? $_GET['page'] : 1;
+
+    if ($search != ''){
+
+        $pagination = Product::getPageSearch($search, $page);
+
+    } else {
+
+        $pagination = Product::getPage($page);
+
+    }
+
+    $pages = [];
+
+    for ($i = 0; $i < $pagination['pages']; $i++){
+        array_push($pages, [
+            'href'=> '/admin/products?'.http_build_query([
+                'page'=> $i+1,
+                'search'=> $search]),
+            'text'=>$i+1
+        ]);
+    }
 
     $page = new PageAdmin();
 
-    $page->setTpl("products", ["products"=>$products]);
+    $page->setTpl("products", [
+        "products"=>$pagination['data'],
+        "search"=> $search,
+        "pages"=> $pages ]);
 });
 
 $app->get("/admin/products/create", function(){
@@ -1108,12 +1133,36 @@ $app->get("/admin/orders", function(){
 
     User::verify_login();
 
-    $pedidos = Order::listAll();
+    $search = (isset($_GET['search'])) ? $_GET['search'] : '';
+    $page = (isset($_GET['page'])) ? $_GET['page'] : 1;
+
+    if ($search != ''){
+
+        $pagination = Order::getPageSearch($search, $page);
+
+    } else {
+
+        $pagination = Order::getPage($page);
+
+    }
+
+    $pages = [];
+
+    for ($i = 0; $i < $pagination['pages']; $i++){
+        array_push($pages, [
+            'href'=> '/admin/orders?'.http_build_query([
+                'page'=> $i+1,
+                'search'=> $search]),
+            'text'=>$i+1
+        ]);
+    }
 
     $page = new PageAdmin();
 
     $page->setTpl("orders", [
-        'orders'=> $pedidos]);
+        "orders"=>$pagination['data'],
+        "search"=> $search,
+        "pages"=> $pages ]);
 });
 
 
