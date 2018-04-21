@@ -36,12 +36,12 @@
                             <th>&nbsp;</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php $counter1=-1;  if( isset($orders) && ( is_array($orders) || $orders instanceof Traversable ) && sizeof($orders) ) foreach( $orders as $key1 => $value1 ){ $counter1++; ?>
+                    <?php $counter1=-1;  if( isset($pedido) && ( is_array($pedido) || $pedido instanceof Traversable ) && sizeof($pedido) ) foreach( $pedido as $key1 => $value1 ){ $counter1++; ?>
 
+                    <tbody>
                         <tr>
                             <th scope="row"><?php echo htmlspecialchars( $value1["idorder"], ENT_COMPAT, 'UTF-8', FALSE ); ?></th>
-                            <td>A</td>
+                            <td>R$<?php echo formatPrice($value1["vltotal"]); ?></td>
                             <td><?php echo htmlspecialchars( $value1["desstatus"], ENT_COMPAT, 'UTF-8', FALSE ); ?></td>
                             <td><?php echo htmlspecialchars( $value1["desaddress"], ENT_COMPAT, 'UTF-8', FALSE ); ?>, <?php echo htmlspecialchars( $value1["desdistrict"], ENT_COMPAT, 'UTF-8', FALSE ); ?>, <?php echo htmlspecialchars( $value1["descity"], ENT_COMPAT, 'UTF-8', FALSE ); ?> - , <?php echo htmlspecialchars( $value1["desstate"], ENT_COMPAT, 'UTF-8', FALSE ); ?> CEP: <?php echo htmlspecialchars( $value1["deszipcode"], ENT_COMPAT, 'UTF-8', FALSE ); ?></td>
                             <td style="width:222px;">
@@ -54,9 +54,10 @@
                         <div class="alert alert-info">
                             Nenhum pedido foi encontrado.
                         </div>
-                        <?php } ?>
 
                     </tbody>
+                    <?php } ?>
+
                 </table>
 
             </div>

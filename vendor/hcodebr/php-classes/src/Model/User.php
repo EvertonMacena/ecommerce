@@ -12,7 +12,7 @@ class User extends Model{
     const SECRET = "LojavirtualPhp79";
     const ERROR = "UserErro";
     const ERROR_REGISTER = "UserErrorRegister";
-    const SUCESS = "Sucesso";
+    const SUCESS = "SucessoUSer";
 
     public static function getFromSession(){
 
@@ -318,7 +318,7 @@ class User extends Model{
     public function getOrders(){
         $sql = new Sql();
 
-        $results = $sql->select("SELECT * FROM tb_orders a INNER JOIN tb_ordersstatus b USING(idstatus)
+        $results = $sql->select("SELECT a.idorder, a.vltotal, b.desstatus, e.desaddress, e.desdistrict, e.descity, e.desstate, e.deszipcode FROM tb_orders a INNER JOIN tb_ordersstatus b USING(idstatus)
             INNER JOIN tb_carts c USING(idcart)
             INNER JOIN tb_users d ON d.iduser = a.iduser
             INNER JOIN tb_addresses e USING(idaddress)
@@ -326,7 +326,50 @@ class User extends Model{
             WHERE a.iduser = :iduser", [
                 ':iduser'=>$this->getiduser()]);
 
-        return $results[0];
+        return $results;
+    }
+
+    public static function getPage( $page = 1, $itensPerPage = 10){
+
+        $start = ($page-1) * $itensPerPage;
+
+        $sql = new Sql();
+
+        $results = $sql->select("SELECT SQL_CALC_FOUND_ROWS *
+            FROM tb_users a
+            INNER JOIN tb_persons b USING(idperson)
+            ORDER BY b.desperson
+            LIMIT $start, $itensPerPage");
+
+        $resultTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+        return ['data'=> $results,
+                'total'=>(int)$resultTotal[0]["nrtotal"],
+                'pages'=>ceil($resultTotal[0]["nrtotal"] / $itensPerPage)];
+
+    }
+
+        public static function getPageSearch($search, $page = 1, $itensPerPage = 10){
+
+        $start = ($page-1) * $itensPerPage;
+
+        $sql = new Sql();
+
+        $results = $sql->select("SELECT SQL_CALC_FOUND_ROWS *
+            FROM tb_users a
+            INNER JOIN tb_persons b USING(idperson)
+            WHERE b.desperson LIKE :search
+            OR b.desemail = :search OR a.deslogin LIKE :search
+            ORDER BY b.desperson
+            LIMIT $start, $itensPerPage", [
+                ':search'=> '%'.$search.'%']);
+
+        $resultTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+        return ['data'=> $results,
+                'total'=>(int)$resultTotal[0]["nrtotal"],
+                'pages'=>ceil($resultTotal[0]["nrtotal"] / $itensPerPage)];
+
     }
 
 

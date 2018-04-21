@@ -279,14 +279,16 @@ $app->get("/boleto/:idorder", function($idorder){
 
 $app->get("/profile/orders", function(){
 
-    User::verify_login();
+    User::verify_login(false);
 
     $user = User::getFromSession();
 
     $page = new Page();
 
+    $pedidos = $user->getOrders();
+
     $page->setTpl("profile-orders", [
-        'orders' => $user->getOrders()
+        'pedido' => $pedidos
     ]);
 
 });
@@ -689,12 +691,36 @@ $app->get("/admin/users", function(){
 
     User::verify_login();
 
-    $users = User::listAll();
+    $search = (isset($_GET['search'])) ? $_GET['search'] : '';
+    $page = (isset($_GET['page'])) ? $_GET['page'] : 1;
+
+    if ($search != ''){
+
+        $pagination = User::getPageSearch($search, $page);
+
+    } else {
+
+        $pagination = User::getPage($page);
+
+    }
+
+    $pages = [];
+
+    for ($i = 0; $i < $pagination['pages']; $i++){
+        array_push($pages, [
+            'href'=> '/admin/users?'.http_build_query([
+                'page'=> $i+1,
+                'search'=> $search]),
+            'text'=>$i+1
+        ]);
+    }
 
     $page = new PageAdmin();
 
     $page->setTpl("users", array(
-        "users" => $users ));
+        "users" => $pagination['data'],
+        "search" => $search,
+        "pages"=> $pages ));
 });
 
 $app->get("/admin/users/create", function(){
@@ -1057,12 +1083,12 @@ $app->get("/admin/orders", function(){
 
     User::verify_login();
 
-    $orders = Order::listAll();
+    $pedidos = Order::listAll();
 
     $page = new PageAdmin();
 
     $page->setTpl("orders", [
-        'orders'=> $orders]);
+        'orders'=> $pedidos]);
 });
 
 

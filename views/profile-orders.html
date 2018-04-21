@@ -34,8 +34,8 @@
                             <th>&nbsp;</th>
                         </tr>
                     </thead>
+                    {loop="$pedido"}
                     <tbody>
-                        {loop="$orders"}
                         <tr>
                             <th scope="row">{$value.idorder}</th>
                             <td>R${function="formatPrice($value.vltotal)"}</td>
@@ -50,8 +50,9 @@
                         <div class="alert alert-info">
                             Nenhum pedido foi encontrado.
                         </div>
-                        {/loop}
+
                     </tbody>
+                    {/loop}
                 </table>
 
             </div>
