@@ -101,5 +101,44 @@ class Category extends Model{
 
         $sql->query("DELETE FROM tb_productscategories  WHERE idcategory = :idcategory AND idproduct = :idproduct", [':idcategory'=>$this->getidcategory(), ':idproduct'=>$product->getidproduct()]);
     }
+
+    public static function getPage( $page = 1, $itensPerPage = 10){
+
+        $start = ($page-1) * $itensPerPage;
+
+        $sql = new Sql();
+
+        $results = $sql->select("SELECT SQL_CALC_FOUND_ROWS *
+            FROM tb_categories ORDER BY descategory
+            LIMIT $start, $itensPerPage");
+
+        $resultTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+        return ['data'=> $results,
+                'total'=>(int)$resultTotal[0]["nrtotal"],
+                'pages'=>ceil($resultTotal[0]["nrtotal"] / $itensPerPage)];
+
+    }
+
+        public static function getPageSearch($search, $page = 1, $itensPerPage = 10){
+
+        $start = ($page-1) * $itensPerPage;
+
+        $sql = new Sql();
+
+        $results = $sql->select("SELECT SQL_CALC_FOUND_ROWS *
+            FROM tb_categories
+            WHERE descategory LIKE :search
+            ORDER BY descategory
+            LIMIT $start, $itensPerPage", [
+                ':search'=> '%'.$search.'%']);
+
+        $resultTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+        return ['data'=> $results,
+                'total'=>(int)$resultTotal[0]["nrtotal"],
+                'pages'=>ceil($resultTotal[0]["nrtotal"] / $itensPerPage)];
+
+    }
 }
 ?>
