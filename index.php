@@ -979,6 +979,93 @@ $app->get("/admin/products/:idproduct/delete", function($idproduct){
 
 });
 
+$app->get("/admin/orders/:idorder/status", function($idorder){
+
+    User::verify_login();
+
+    $order = new Order();
+
+    $order->get((int)$idorder);
+
+    $page = new PageAdmin();
+
+    $page->setTpl("order-status", [
+        'order'=> $order->getValues(),
+        'status' => OrderStatus::listAll(),
+        'msgError' => Order::getMsgErro(),
+        'msgSuccess' => Order::getSucess()]);
+});
+
+$app->post("/admin/orders/:idorder/status", function($idorder){
+
+    User::verify_login();
+
+    if (!isset($_POST['idstatus']) || (int)$_POST['idstatus'] <= 0) {
+        Order:setMsgErro("informe o status atual");
+        header("Location: /admin/orders/".$idorder."/status");
+        exit;
+    }
+
+    $order = new Order();
+
+    $order->get((int)$idorder);
+
+    $order->setidstatus((int)$_POST['idstatus']);
+
+    $order->save();
+
+    Order::setSucess("status atualizado");
+
+    header("Location: /admin/orders/".$idorder."/status");
+    exit;
+
+});
+
+$app->get("/admin/orders/:idorder/delete", function($idorder){
+
+    User::verify_login();
+
+    $order = new Order();
+
+    $order->get((int)$idorder);
+
+    $order->delete();
+
+    header("Location: /admin/orders");
+    exit;
+});
+
+$app->get("/admin/orders/:idorder", function($idorder){
+
+    User::verify_login();
+
+    $order = new Order();
+
+    $order->get((int)$idorder);
+
+    $cart = $order->getCart($idorder);
+
+    $page = new PageAdmin();
+
+    $page->setTpl("order", [
+        'order'=> $order->getValues(),
+        'products'=>$cart->getProducts(),
+        'cart'=>$cart->getValues()]);
+});
+
+$app->get("/admin/orders", function(){
+
+    User::verify_login();
+
+    $orders = Order::listAll();
+
+    $page = new PageAdmin();
+
+    $page->setTpl("orders", [
+        'orders'=> $orders]);
+});
+
+
 
 
 
