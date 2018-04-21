@@ -795,6 +795,59 @@ $app->post("/admin/users/:iduser", function($iduser){
     exit;
 });
 
+$app->get("/admin/users/:iduser/password", function ($iduser){
+
+    User::verify_login();
+
+    $user = new User();
+
+    $user->get((int)$iduser);
+
+    $page = new PageAdmin();
+
+    $page->setTpl("users-password",[
+        'user'=> $user->getValues(),
+        'msgError' => User::getMsgErro(),
+        'msgSuccess' => User::getSucess()]);
+
+});
+
+$app->post("/admin/users/:iduser/password", function ($iduser){
+
+    User::verify_login();
+
+    if(!isset($_POST['despassword']) || $_POST['despassword'] === ''){
+        User::setMsgErro("Digite a nova senha");
+        header("Location: /admin/users/".$iduser."/password");
+        exit;
+    }
+    if(!isset($_POST['despassword-confirm']) || $_POST['despassword-confirm'] === ''){
+        User::setMsgErro("Confirme a nova senha");
+        header("Location: /admin/users/".$iduser."/password");
+        exit;
+    }
+
+    if ($_POST['despassword'] !== $_POST['despassword-confirm']){
+        User::setMsgErro("Confirme corretamente as senhas");
+        header("Location: /admin/users/".$iduser."/password");
+        exit;
+    }
+
+    $user = new User();
+
+    $user->get((int)$iduser);
+
+    $user->setPassword(User::getPasswordHash($_POST['despassword']));
+
+
+    User::setSucess("senha alterada com sucesso");
+    header("Location: /admin/users/".$iduser."/password");
+    exit;
+
+
+
+});
+
 
 $app->get("/admin/categories", function(){
 
